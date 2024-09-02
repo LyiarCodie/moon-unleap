@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,10 +7,11 @@ namespace moon_unleap;
 internal class Player : Sprite
 {
     private List<Collider> collidersGroup = new List<Collider>();
+    private List<Platform> onewayPlatforms = new List<Platform>();
 
     private float scaleFactor;
     private float gravity = 9.8f;
-    private float jumpForce = -200f;
+    private float jumpForce = -220f;
     private bool onFloor = false;
     private SpriteEffects flipX;
 
@@ -39,7 +39,7 @@ internal class Player : Sprite
 
     private float moveSpeed = 200f;
 
-    public Player(Game1 game, KeyboardManager keyboard, Texture2D texture, Vector2 position, float scaleFactor, List<Collider> collidersGroup)
+    public Player(Game1 game, KeyboardManager keyboard, Texture2D texture, Vector2 position, float scaleFactor, List<Collider> collidersGroup, List<Platform> onewayPlatforms)
     : base (texture, position)
     {
         collider = new Collider(
@@ -52,6 +52,7 @@ internal class Player : Sprite
         this.keyboard = keyboard;
         this.scaleFactor = scaleFactor;
         this.collidersGroup = collidersGroup;
+        this.onewayPlatforms = onewayPlatforms;
         flipX = SpriteEffects.None;
     }
 
@@ -83,9 +84,21 @@ internal class Player : Sprite
             if (this.collider.IsTouching(0, velocity.Y, collider.rect) && velocity.Y != 0)
             {
                 velocity.Y = 0f;
+                onFloor = this.collider.Bottom >= collider.Top;
             }
+        }
 
-            onFloor = this.collider.Bottom >= collider.Top;
+        // vertical collision
+        foreach (var platform in onewayPlatforms)
+        {
+            if (collider.Bottom < platform.collider.Top + 2 && velocity.Y > 0)
+            {
+                if (collider.IsTouching(0, velocity.Y, platform.collider.rect) && velocity.Y != 0)
+                {
+                    velocity.Y = 0f;
+                    onFloor = collider.Bottom >= platform.collider.Top;
+                }
+            }
         }
         position.Y += velocity.Y;
 
