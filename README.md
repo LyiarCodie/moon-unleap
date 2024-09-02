@@ -3,4 +3,4 @@
 
 ✨ I did this just to learn more about MonoGame, enjoy!
 
-![preview of the project running]()
+![preview of the project running](https://github.com/LyiarCodie/moon-unleap/blob/main/preview.gif)
